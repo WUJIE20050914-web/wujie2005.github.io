@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HTML满屏静态弹窗（慢速生成+延长消失）</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            background: #1e1e1e; /* 仿编辑器深色背景 */
+            overflow: hidden;
+            font-family: "微软雅黑", "Consolas", monospace;
+        }
+        /* 弹窗容器样式 */
+        .popup {
+            position: absolute;
+            width: 120px; /* 弹窗宽度 */
+            height: 80px; /* 弹窗高度 */
+            background: #fff;
+            border-radius: 6px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+            pointer-events: none; /* 避免遮挡鼠标 */
+            overflow: hidden;
+        }
+        /* 弹窗标题栏 */
+        .popup-header {
+            height: 20px;
+            background: var(--header-color); /* 随机标题栏颜色 */
+            padding: 0 6px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        /* 弹窗关闭按钮（视觉） */
+        .popup-close {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #ff5c5c;
+        }
+        /* 弹窗内容区 */
+        .popup-content {
+            padding: 8px;
+            font-size: 12px;
+            color: #333;
+            height: calc(100% - 20px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            background: #f8f8f8;
+        }
+    </style>
+</head>
+<body>
+    <script>
+        // 弹窗文案池（保留原图核心文案）
+        const messages = [
+            
+            "要开心哦", "别熬夜", "早点休息", "好好爱自己",
+                        "保持微笑呀", "多喝热水", "记得吃水果", "今天过得开心嘛",
+                        "梦想成真", "期待下次相见", "愿所有烦恼都消失",
+                        "要记得想我哦", "好好睡觉哦", "要好好吃饭哦", "天冷了，多添衣哦",
+            			"我爱你，宝宝", "小芸", "我们结婚吧", "要天天开心哦",
+						"老婆最大", "雷大美", "1162天", "在一起三年了",
+						"小祖宗", "我爱你哦", "公主", "吴杰 雷显芸"
+        ];
+
+        // 弹窗标题栏颜色池（马卡龙色系）
+        const headerColors = [
+            "#FF6B6B", "#4ECDC4", "#45B7D1", "#96CEB4", "#FFEAA7",
+            "#DDA0DD", "#98D8C8", "#F7DC6F", "#BB8FCE", "#85C1E9"
+        ];
+
+        // 创建单个静态弹窗
+        function createPopup() {
+            // 1. 创建弹窗容器
+            const popup = document.createElement("div");
+            popup.className = "popup";
+
+            // 2. 创建标题栏
+            const header = document.createElement("div");
+            header.className = "popup-header";
+            // 随机标题栏颜色
+            const randomColor = headerColors[Math.floor(Math.random() * headerColors.length)];
+            popup.style.setProperty("--header-color", randomColor);
+
+            // 3. 创建关闭按钮
+            const closeBtn = document.createElement("div");
+            closeBtn.className = "popup-close";
+            header.appendChild(closeBtn);
+
+            // 4. 创建内容区
+            const content = document.createElement("div");
+            content.className = "popup-content";
+            // 随机文案
+            content.textContent = messages[Math.floor(Math.random() * messages.length)];
+
+            // 组装弹窗
+            popup.appendChild(header);
+            popup.appendChild(content);
+
+            // 随机初始位置（屏幕内，避免超出）
+            popup.style.left = `${Math.random() * (window.innerWidth - 120)}px`;
+            popup.style.top = `${Math.random() * (window.innerHeight - 80)}px`;
+            // 仅保留轻微随机缩放（增加层次感，无旋转/摆动）
+            popup.style.scale = `${0.8 + Math.random() * 0.4}`;
+
+            // 添加到页面
+            document.body.appendChild(popup);
+
+            // 弹窗消失时间延长一倍：从10-15秒 → 20-30秒
+            setTimeout(() => {
+                popup.remove();
+            }, 20000 + Math.random() * 10000);
+        }
+
+        // 批量生成弹窗：间隔320ms（相比最初80ms慢4倍）
+        setInterval(createPopup, 320);
+
+        // 窗口大小适配（仅调整位置，无移动）
+        window.addEventListener("resize", () => {
+            document.querySelectorAll(".popup").forEach(popup => {
+                popup.style.left = Math.min(parseFloat(popup.style.left), window.innerWidth - 120) + "px";
+                popup.style.top = Math.min(parseFloat(popup.style.top), window.innerHeight - 80) + "px";
+            });
+        });
+    </script>
+</body>
+</html>
